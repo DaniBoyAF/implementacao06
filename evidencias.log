@@ -1,0 +1,291 @@
+evidencias.log - Algoritmo de Banker
+Gerado em: 15/11/2026 13:14:17 -03
+Sistema:   Linux 6.18.44-fc-v470
+Compilador: gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+Make:       GNU Make 4.3
+
+################ 1. Compilacao (make clean; make) ################
+rm -f banker *.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -O2 -o banker banker.c
+status: 0
+
+################ 2. Testes (testes/rodar_testes.sh) ################
+=== Exemplo do professor (comparacao byte a byte com result.txt) ===
+
+--- exemplo do enunciado
+$ ./banker 10 5 7
+11 comandos processados. Saida gravada em result.txt
+(status de saida: 0; esperado: 0)
+[PASS]
+[PASS] result.txt identico ao esperado
+
+=== Outro numero de clientes e de recursos (2 recursos, 3 clientes) ===
+
+--- 2 recursos, 3 clientes
+$ ./banker 6 4
+6 comandos processados. Saida gravada em result.txt
+(status de saida: 0; esperado: 0)
+[PASS]
+Allocate to customer 0 the resources 1 1
+Allocate to customer 1 the resources 2 0
+MAXIMUM   |   ALLOCATION  |   NEED
+4 3       |   1 1         |   3 2 
+2 2       |   2 0         |   0 2 
+3 1       |   0 0         |   3 1 
+AVAILABLE 3 3 
+Release from customer 0 the resources 1 0
+Allocate to customer 2 the resources 3 1
+MAXIMUM   |   ALLOCATION  |   NEED
+4 3       |   0 1         |   4 2 
+2 2       |   2 0         |   0 2 
+3 1       |   3 1         |   0 0 
+AVAILABLE 1 2 
+
+=== Liberacao maior que a alocacao ===
+
+--- release acima do alocado
+$ ./banker 5 5
+2 comandos processados. Saida gravada em result.txt
+(status de saida: 0; esperado: 0)
+[PASS]
+Allocate to customer 0 the resources 1 1
+The customer 0 release 2 0 was denied because exceed its allocation
+
+=== Erros de argumentos ===
+
+--- sem argumentos
+$ ./banker 
+Erro: numero de argumentos insuficiente. Uso: ./banker <instancias do recurso 0> [<instancias do recurso 1> ...]
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- argumentos a menos (2 de 3)
+$ ./banker 10 5
+Erro: numero de argumentos (2) incompativel com customer.txt (3 recursos por linha)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- argumentos a mais (4 de 3)
+$ ./banker 10 5 7 1
+Erro: numero de argumentos (4) incompativel com customer.txt (3 recursos por linha)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- argumento nao numerico
+$ ./banker 10 a 7
+Erro: argumento 2 invalido 'a' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- argumento negativo
+$ ./banker 10 -5 7
+Erro: argumento 2 invalido '-5' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- argumento decimal
+$ ./banker 10 5.5 7
+Erro: argumento 2 invalido '5.5' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+=== Erros em customer.txt ===
+
+--- customer.txt inexistente
+$ ./banker 10 5 7
+Erro: nao foi possivel abrir 'customer.txt': No such file or directory
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- customer.txt e um diretorio
+$ ./banker 10 5 7
+Erro: falha ao ler 'customer.txt'
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- customer.txt vazio
+$ ./banker 10 5 7
+Erro: 'customer.txt' esta vazio
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- valor nao numerico
+$ ./banker 10 5 7
+Erro: customer.txt linha 2: valor invalido 'x' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- linha com colunas a menos
+$ ./banker 10 5 7
+Erro: customer.txt linha 2: esperados 3 valores separados por virgula
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- linha com colunas a mais
+$ ./banker 10 5 7
+Erro: customer.txt linha 2: esperados 3 valores separados por virgula
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- linha em branco no meio
+$ ./banker 10 5 7
+Erro: 'customer.txt' linha 2: linha em branco no meio do arquivo
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- campo vazio entre virgulas
+$ ./banker 10 5 7
+Erro: customer.txt linha 1: valor invalido '' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- valor negativo
+$ ./banker 10 5 7
+Erro: customer.txt linha 1: valor invalido '-5' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- separado por espaco em vez de virgula
+$ ./banker 10 5 7
+Erro: numero de argumentos (3) incompativel com customer.txt (1 recursos por linha)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- valor maior que INT_MAX
+$ ./banker 10 5 7
+Erro: customer.txt linha 1: valor invalido '99999999999' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+=== Erros em commands.txt ===
+
+--- commands.txt inexistente
+$ ./banker 10 5 7
+Erro: nao foi possivel abrir 'commands.txt': No such file or directory
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- commands.txt vazio
+$ ./banker 10 5 7
+Erro: 'commands.txt' esta vazio
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- comando desconhecido
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: comando desconhecido 'XX' (esperado RQ, RL ou *)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- comando em minusculas
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: comando desconhecido 'rq' (esperado RQ, RL ou *)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- RQ com valores a menos
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: esperados o numero do cliente e 3 valores de recurso (um por argumento), encontrados 3 parametros
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- RQ com valores a mais
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: esperados o numero do cliente e 3 valores de recurso (um por argumento), encontrados 5 parametros
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- cliente inexistente
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: cliente invalido '9' (esperado de 0 a 4)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- cliente negativo
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: cliente invalido '-1' (esperado de 0 a 4)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- valor nao numerico
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: valor invalido 'a' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- valor negativo
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: valor invalido '-1' (esperado inteiro nao negativo)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- '*' com parametro
+$ ./banker 10 5 7
+Erro: commands.txt linha 1: o comando '*' nao recebe parametros
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- linha em branco no meio
+$ ./banker 10 5 7
+Erro: 'commands.txt' linha 2: linha em branco no meio do arquivo
+(status de saida: 1; esperado: 1)
+[PASS]
+
+--- erro na 2a linha nao gera saida parcial
+$ ./banker 10 5 7
+Erro: commands.txt linha 2: cliente invalido '9' (esperado de 0 a 4)
+(status de saida: 1; esperado: 1)
+[PASS]
+
+=== Formatos aceitos ===
+
+--- CRLF, espacos e linhas em branco no fim
+$ ./banker 10 5 7
+3 comandos processados. Saida gravada em result.txt
+(status de saida: 0; esperado: 0)
+[PASS]
+Allocate to customer 0 the resources 0 1 1
+MAXIMUM   |   ALLOCATION  |   NEED
+7 5 3     |   0 1 1       |   7 4 2 
+3 2 2     |   0 0 0       |   3 2 2 
+AVAILABLE 10 4 6 
+Allocate to customer 1 the resources 1 0 0
+
+==========================================
+Resultado: 35 aprovados, 0 falhas
+status dos testes: 0
+
+################ 3. Verificacao cruzada com implementacao independente em Python ################
+(a referencia testa todas as ordens de termino dos clientes, sem reutilizar o algoritmo do banker.c)
+2000 casos aleatorios (semente 2026): saidas identicas a referencia.
+Situacoes cobertas: alocados=6358, negados_inseguro=3049, faltam_recursos=1131, excede_maximo=18582, release=1532
+2000 casos aleatorios (semente 7): saidas identicas a referencia.
+Situacoes cobertas: alocados=6277, negados_inseguro=3190, faltam_recursos=1050, excede_maximo=18602, release=1499
+
+################ 4. Valgrind (vazamentos e acessos invalidos) ################
+$ valgrind --leak-check=full --error-exitcode=9 ./banker 10 5 7   (exemplo do enunciado)
+==8382==     in use at exit: 0 bytes in 0 blocks
+==8382==   total heap usage: 69 allocs, 69 frees, 19,478 bytes allocated
+==8382== All heap blocks were freed -- no leaks are possible
+==8382== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+status: 0
+$ valgrind ... ./banker 10 5   (argumentos incompativeis)
+Erro: numero de argumentos (2) incompativel com customer.txt (3 recursos por linha)
+==8385== All heap blocks were freed -- no leaks are possible
+==8385== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+$ valgrind ... ./banker 10 5 7   (commands.txt com cliente inexistente)
+Erro: commands.txt linha 2: cliente invalido '9' (esperado de 0 a 4)
+==8388== All heap blocks were freed -- no leaks are possible
+==8388== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+################ 5. AddressSanitizer + UndefinedBehaviorSanitizer ################
+11 comandos processados. Saida gravada em result.txt
+exemplo do enunciado: sem erros de sanitizer e result.txt identico ao esperado
+erro de argumentos: status 1 (sem relatorio de sanitizer: 0)
+
+################ 6. Recompilacao final e limpeza ################
+rm -f banker *.o
+gcc -std=c11 -Wall -Wextra -Wpedantic -O2 -o banker banker.c
+-rwxr-xr-x 1 root root 21640 Nov 15 13:14 banker
+rm -f banker *.o
+ls: cannot access 'banker': No such file or directory
