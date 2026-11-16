@@ -23,6 +23,13 @@
 #include <string.h>
 #include <sys/types.h>
 
+#ifdef _WIN32
+char *_strdup(const char *);
+char *strtok_s(char *, const char *, char **);
+#define strdup  _strdup
+#define strtok_r strtok_s
+#endif
+
 #define ARQ_CLIENTES  "customer.txt"
 #define ARQ_COMANDOS  "commands.txt"
 #define ARQ_RESULTADO "result.txt"
